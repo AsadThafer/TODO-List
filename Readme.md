@@ -1,7 +1,8 @@
 # Todo List Javascript Project
 
 This project is a simple todo list application written in JavaScript. It allows users to create, update status,search and delete todo list items.
-Task of my internship at <a href="https://www.foothillsolutions.com">Foothill Technology Solutions, LLC.</a>
+
+this Task is a part of my internship at <a href="https://www.foothillsolutions.com">Foothill Technology Solutions, LLC.</a>
 
 ## Features
 

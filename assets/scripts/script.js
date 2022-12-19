@@ -48,8 +48,6 @@ const deleteTaskHandler = (TaskId) => {
   saveToLocal();
 };
 
-
-
 // const startUpdateTaskHandler = (TaskId) => {
 //   const Task = Tasks.find((t) => t.id === TaskId);
 //   const title = Task.title;
@@ -107,7 +105,6 @@ const deleteTaskHandler = (TaskId) => {
 //   updateTaskModalBackdrop.classList.add("visible");
 // };
 
-
 const startdeleteTaskHandler = (TaskId) => {
   deleteTaskModal.classList.add("visible");
   toggleBackdrop();
@@ -140,36 +137,34 @@ const updateStatus = (TaskId) => {
   if (Tasks[IdentifiedIndex].status == "TO-DO") {
     Tasks[IdentifiedIndex].status = "DONE";
     listRoot.children[IdentifiedIndex].className = "Task-element DONE";
-    listRoot.children[IdentifiedIndex].querySelector(".btn--done").textContent = "Not Done ❌";
+    listRoot.children[IdentifiedIndex].querySelector(".btn--done").textContent =
+      "Not Done ❌";
     console.log(IdentifiedIndex + " " + Tasks[IdentifiedIndex].status);
-  } 
-  else if (Tasks[IdentifiedIndex].status == "DONE"){
+  } else if (Tasks[IdentifiedIndex].status == "DONE") {
     Tasks[IdentifiedIndex].status = "TO-DO";
     listRoot.children[IdentifiedIndex].className = "Task-element TO-DO";
-    listRoot.children[IdentifiedIndex].querySelector(".btn--done").textContent = "Done ✔️";
+    listRoot.children[IdentifiedIndex].querySelector(".btn--done").textContent =
+      "Done ✔️";
     console.log(IdentifiedIndex + " " + Tasks[IdentifiedIndex].status);
   }
   updateTaskCount();
   saveToLocal();
 };
 
-
-
 const updateButton = () => {
-  let i =0;
+  let i = 0;
   for (const Task of Tasks) {
     if (Task.status == "TO-DO") {
       listRoot.children[i].querySelector(".btn--done").textContent = "Done ✔️";
     } else if (Task.status == "DONE") {
-      listRoot.children[i].querySelector(".btn--done").textContent = "Not Done ❌";
+      listRoot.children[i].querySelector(".btn--done").textContent =
+        "Not Done ❌";
     }
     i++;
   }
 };
 
-
-
-const renderNewTaskElement = (id,title,Assignee,status) => {
+const renderNewTaskElement = (id, title, Assignee, status) => {
   const newTaskElement = document.createElement("li");
   newTaskElement.className = `Task-element ${status}`;
   newTaskElement.innerHTML = `
@@ -191,7 +186,6 @@ const renderNewTaskElement = (id,title,Assignee,status) => {
   const listRoot = document.getElementById("Task-list");
   listRoot.append(newTaskElement);
 };
-
 
 const updateTaskCount = () => {
   let toDoCount = 0;
@@ -225,10 +219,7 @@ const clearTaskInput = () => {
 const AddTaskHandler = () => {
   const titleValue = userInputs[0].value;
   const AssigneeValue = userInputs[1].value;
-  if (
-    titleValue.trim() === "" ||
-    AssigneeValue.trim() === ""
-  ) {
+  if (titleValue.trim() === "" || AssigneeValue.trim() === "") {
     alert("Please enter valid values (non-empty values).");
     return;
   }
@@ -236,7 +227,7 @@ const AddTaskHandler = () => {
     id: Math.random().toString(),
     title: titleValue,
     Assignee: AssigneeValue,
-    status: "TO-DO"
+    status: "TO-DO",
   };
   Tasks.push(newTask);
   console.log(Tasks);
@@ -253,7 +244,6 @@ const AddTaskHandler = () => {
   updateTaskCount();
   saveToLocal();
 };
-
 
 const cancelAddTaskHandler = () => {
   closeTaskModal();
@@ -274,29 +264,20 @@ confirmAddTaskButton.addEventListener("click", AddTaskHandler);
 
 const refresh = () => {
   for (const Task of Tasks) {
-    renderNewTaskElement(
-      Task.id,
-      Task.title,
-      Task.Assignee,
-      Task.status
-    );
+    renderNewTaskElement(Task.id, Task.title, Task.Assignee, Task.status);
     // updateStatus(Task.id);
     // updateStatus(Task.id);
   }
   updateTaskCount();
   updateUI();
   updateButton();
-  
-  
 };
-
 
 // parse the data from local storage
 if (storage !== null) {
   Tasks = JSON.parse(storage);
   refresh();
 }
-
 
 // search bar
 const searchTasks = () => {
@@ -307,12 +288,7 @@ const searchTasks = () => {
   });
   listRoot.innerHTML = "";
   for (const Task of filteredTasks) {
-    renderNewTaskElement(
-      Task.id,
-      Task.title,
-      Task.Assignee,
-      Task.status
-    );
+    renderNewTaskElement(Task.id, Task.title, Task.Assignee, Task.status);
   }
 };
 

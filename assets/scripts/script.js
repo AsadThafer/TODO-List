@@ -1,11 +1,9 @@
 const addTaskModal = document.getElementById("add-modal");
 const startAddTaskButton = document.querySelector("#startAddTask");
-const backdrop = document.getElementById("backdrop");
 const cancelAddTaskButton = addTaskModal.querySelector(".btn--passive");
 const confirmAddTaskButton = addTaskModal.querySelector(".btn--success");
 const userInputs = addTaskModal.querySelectorAll("input"); //array like
 const entryTextSection = document.getElementById("entry-text");
-const deleteTaskModal = document.getElementById("delete-modal");
 const updateTaskModal = document.getElementById("update-modal");
 const todoCountSpan = document.getElementById("TO-DO");
 const doneCountSpan = document.getElementById("DONE");
@@ -15,9 +13,7 @@ let storage = localStorage.getItem("TasksList");
 
 let Tasks = [];
 
-const toggleBackdrop = () => {
-  backdrop.classList.toggle("visible");
-};
+// visual
 
 const updateUI = () => {
   if (Tasks.length === 0) {
@@ -27,149 +23,51 @@ const updateUI = () => {
   }
 };
 
-const closeTaskDeletionModal = () => {
-  toggleBackdrop();
-  deleteTaskModal.classList.remove("visible");
+const toggleTaskModal = () => {
+  addTaskModal.classList.toggle("visible");
+  createBackDrop();
 };
 
-const deleteTaskHandler = (TaskId) => {
-  let IdentifiedIndex = 0;
-  for (const Task of Tasks) {
-    if (Task.id === TaskId) {
-      break;
-    }
-    IdentifiedIndex++;
+const clearTaskInput = () => {
+  for (const userInput of userInputs) {
+    userInput.value = "";
   }
-  Tasks.splice(IdentifiedIndex, 1);
-  listRoot.children[IdentifiedIndex].remove();
-  closeTaskDeletionModal();
-  updateUI();
-  updateTaskCount();
-  saveToLocal();
-};
-
-
-
-// const startUpdateTaskHandler = (TaskId) => {
-//   const Task = Tasks.find((t) => t.id === TaskId);
-//   const title = Task.title;
-//   const Assignee = Task.Assignee;
-//   const status = Task.status;
-//   const updateTaskModal = document.getElementById("update-modal");
-//   const updateTaskTitle = updateTaskModal.querySelector("#update-title");
-//   const updateTaskDescription = updateTaskModal.querySelector(
-//     "#update-description"
-//   );
-//   const updateTaskDate = updateTaskModal.querySelector("#update-date");
-//   const updateTaskTime = updateTaskModal.querySelector("#update-time");
-//   const updateTaskStatus = updateTaskModal.querySelector("#update-status");
-//   const updateTaskButton = updateTaskModal.querySelector(".btn--success");
-//   const cancelUpdateTaskButton = updateTaskModal.querySelector(".btn--passive");
-//   const updateTaskModalBackdrop = document.getElementById("backdrop");
-//   const updateTaskModalCloseButton = updateTaskModal.querySelector(
-//     ".btn--passive"
-//   );
-//   updateTaskTitle.value = title;
-//   updateTaskAssignee.value = description;
-//   updateTaskStatus.value = status;
-//   updateTaskButton.addEventListener("click", () => {
-//     const updatedTitle = updateTaskTitle.value;
-//     const updatedAssignee = updateTaskAssignee.value;
-//     const updatedStatus = updateTaskStatus.value;
-//     const updatedTask = {
-//       id: TaskId,
-//       title: updatedTitle,
-//       description: updatedAssignee,
-//       status: updatedStatus,
-//     };
-//     Tasks[index] = updatedTask;
-//     listRoot.children[index].remove();
-//     renderNewTaskElement(updatedTask.id, updatedTask.title, updatedTask.Assignee,updatedTask.status);
-//     updateTaskModal.classList.remove("visible");
-//     updateTaskModalBackdrop.classList.remove("visible");
-//     updateUI();
-//     updateTaskCount();
-//     saveToLocal();
-//   });
-//   cancelUpdateTaskButton.addEventListener("click", () => {
-//     updateTaskModal.classList.remove("visible");
-//     updateTaskModalBackdrop.classList.remove("visible");
-//   });
-//   updateTaskModalCloseButton.addEventListener("click", () => {
-//     updateTaskModal.classList.remove("visible");
-//     updateTaskModalBackdrop.classList.remove("visible");
-//   });
-//   updateTaskModalBackdrop.addEventListener("click", () => {
-//     updateTaskModal.classList.remove("visible");
-//     updateTaskModalBackdrop.classList.remove("visible");
-//   });
-//   updateTaskModal.classList.add("visible");
-//   updateTaskModalBackdrop.classList.add("visible");
-// };
-
-
-const startdeleteTaskHandler = (TaskId) => {
-  deleteTaskModal.classList.add("visible");
-  toggleBackdrop();
-  const cancelDeletionButton = deleteTaskModal.querySelector(".btn--passive");
-  let confirmDeletionButton = deleteTaskModal.querySelector(".btn--danger");
-  confirmDeletionButton.replaceWith(confirmDeletionButton.cloneNode(true));
-  confirmDeletionButton = deleteTaskModal.querySelector(".btn--danger");
-  cancelDeletionButton.removeEventListener("click", closeTaskDeletionModal);
-  cancelDeletionButton.addEventListener("click", closeTaskDeletionModal);
-  confirmDeletionButton.addEventListener(
-    "click",
-    deleteTaskHandler.bind(null, TaskId)
-  );
-};
-
-// save to local storage
-const saveToLocal = () => {
-  localStorage.setItem("TasksList", JSON.stringify(Tasks));
 };
 
 const updateStatus = (TaskId) => {
-  let IdentifiedIndex = 0;
   console.log(Tasks);
-  for (const Task of Tasks) {
-    if (Task.id === TaskId) {
-      break;
-    }
-    IdentifiedIndex++;
-  }
+  const IdentifiedIndex = Tasks.findIndex((task) => task.id === TaskId);
   if (Tasks[IdentifiedIndex].status == "TO-DO") {
     Tasks[IdentifiedIndex].status = "DONE";
     listRoot.children[IdentifiedIndex].className = "Task-element DONE";
-    listRoot.children[IdentifiedIndex].querySelector(".btn--done").textContent = "Not Done ❌";
+    listRoot.children[IdentifiedIndex].querySelector(".btn--done").textContent =
+      "Not Done ❌";
     console.log(IdentifiedIndex + " " + Tasks[IdentifiedIndex].status);
-  } 
-  else if (Tasks[IdentifiedIndex].status == "DONE"){
+  } else if (Tasks[IdentifiedIndex].status == "DONE") {
     Tasks[IdentifiedIndex].status = "TO-DO";
     listRoot.children[IdentifiedIndex].className = "Task-element TO-DO";
-    listRoot.children[IdentifiedIndex].querySelector(".btn--done").textContent = "Done ✔️";
+    listRoot.children[IdentifiedIndex].querySelector(".btn--done").textContent =
+      "Done ✔️";
     console.log(IdentifiedIndex + " " + Tasks[IdentifiedIndex].status);
   }
   updateTaskCount();
   saveToLocal();
 };
 
-
-
 const updateButton = () => {
-  let i =0;
+  let i = 0;
   for (const Task of Tasks) {
     if (Task.status == "TO-DO") {
       listRoot.children[i].querySelector(".btn--done").textContent = "Done ✔️";
     } else if (Task.status == "DONE") {
-      listRoot.children[i].querySelector(".btn--done").textContent = "Not Done ❌";
+      listRoot.children[i].querySelector(".btn--done").textContent =
+        "Not Done ❌";
     }
     i++;
   }
 };
 
-
-
-const renderNewTaskElement = (id,title,Assignee,status) => {
+const renderNewTaskElement = (id, title, Assignee, status) => {
   const newTaskElement = document.createElement("li");
   newTaskElement.className = `Task-element ${status}`;
   newTaskElement.innerHTML = `
@@ -186,12 +84,11 @@ const renderNewTaskElement = (id,title,Assignee,status) => {
     updateStatus(id);
   });
   newTaskElement.querySelector(".btn--delete").addEventListener("click", () => {
-    startdeleteTaskHandler(id);
+    createDeleteModal(id);
   });
   const listRoot = document.getElementById("Task-list");
   listRoot.append(newTaskElement);
 };
-
 
 const updateTaskCount = () => {
   let toDoCount = 0;
@@ -207,28 +104,79 @@ const updateTaskCount = () => {
   doneCountSpan.textContent = doneCount;
 };
 
-const closeTaskModal = () => {
-  addTaskModal.classList.remove("visible");
-};
-
-const showTaskModal = () => {
-  addTaskModal.classList.add("visible");
-  toggleBackdrop();
-};
-
-const clearTaskInput = () => {
-  for (const userInput of userInputs) {
-    userInput.value = "";
+const createBackDrop = () => {
+  if (document.getElementById("backdrop")) {
+    backdrop.remove();
+  } else {
+    const backdrop = document.createElement("div");
+    backdrop.classList.add("backdrop");
+    backdrop.classList.add("visible");
+    backdrop.id = "backdrop";
+    backdrop.addEventListener("click", () => {
+      backdrop.remove();
+      addTaskModal.classList.remove("visible");
+      if (document.getElementById("delete-modal")) {
+        document.getElementById("delete-modal").remove();
+      }
+    });
+    document.body.append(backdrop);
   }
 };
 
+const createDeleteModal = (id) => {
+  const deleteTaskElement = document.createElement("div");
+  deleteTaskElement.classList.add("modal");
+  deleteTaskElement.classList.add("visible");
+  deleteTaskElement.id = "delete-modal";
+  const myh2 = document.createElement("h2");
+  myh2.classList.add("modal__title");
+  myh2.textContent = "Are you sure?";
+  const myp = document.createElement("p");
+  myp.classList.add("modal__content");
+  myp.textContent = "Are you sure you want to delete this Task?";
+  const mydiv = document.createElement("div");
+  mydiv.classList.add("modal__actions");
+  const mybutton1 = document.createElement("button");
+  mybutton1.classList.add("btn");
+  mybutton1.classList.add("btn--passive");
+  mybutton1.textContent = "Cancel";
+  mybutton1.addEventListener("click", () => {
+    deleteTaskElement.remove();
+    createBackDrop();
+  });
+  const mybutton2 = document.createElement("button");
+  mybutton2.classList.add("btn");
+  mybutton2.classList.add("btn--danger");
+  mybutton2.textContent = "Delete";
+  mybutton2.addEventListener("click", (i) => {
+    IdentifiedIndex = Tasks.findIndex((task) => task.id === id);
+    Tasks.splice(IdentifiedIndex, 1);
+    listRoot.children[IdentifiedIndex].remove();
+    i.target.parentElement.parentElement.remove();
+    updateUI();
+    updateTaskCount();
+    saveToLocal();
+    createBackDrop();
+  });
+  mydiv.append(mybutton1);
+  mydiv.append(mybutton2);
+  deleteTaskElement.append(myh2);
+  deleteTaskElement.append(myp);
+  deleteTaskElement.append(mydiv);
+  createBackDrop();
+  document.body.append(deleteTaskElement);
+};
+
+// save to local storage
+const saveToLocal = () => {
+  localStorage.setItem("TasksList", JSON.stringify(Tasks));
+};
+
+//add task
 const AddTaskHandler = () => {
   const titleValue = userInputs[0].value;
   const AssigneeValue = userInputs[1].value;
-  if (
-    titleValue.trim() === "" ||
-    AssigneeValue.trim() === ""
-  ) {
+  if (titleValue.trim() === "" || AssigneeValue.trim() === "") {
     alert("Please enter valid values (non-empty values).");
     return;
   }
@@ -236,12 +184,11 @@ const AddTaskHandler = () => {
     id: Math.random().toString(),
     title: titleValue,
     Assignee: AssigneeValue,
-    status: "TO-DO"
+    status: "TO-DO",
   };
   Tasks.push(newTask);
   console.log(Tasks);
-  closeTaskModal();
-  toggleBackdrop();
+  toggleTaskModal();
   clearTaskInput();
   updateUI();
   renderNewTaskElement(
@@ -254,49 +201,27 @@ const AddTaskHandler = () => {
   saveToLocal();
 };
 
-
 const cancelAddTaskHandler = () => {
-  closeTaskModal();
-  toggleBackdrop();
+  toggleTaskModal();
   clearTaskInput();
 };
 
-const backdropClickHandler = () => {
-  closeTaskModal();
-  closeTaskDeletionModal();
-  clearTaskInput();
-};
-
-startAddTaskButton.addEventListener("click", showTaskModal);
-backdrop.addEventListener("click", backdropClickHandler);
-cancelAddTaskButton.addEventListener("click", cancelAddTaskHandler);
-confirmAddTaskButton.addEventListener("click", AddTaskHandler);
-
+// update Page content and UI elements after Refresh
 const refresh = () => {
   for (const Task of Tasks) {
-    renderNewTaskElement(
-      Task.id,
-      Task.title,
-      Task.Assignee,
-      Task.status
-    );
-    // updateStatus(Task.id);
-    // updateStatus(Task.id);
+    renderNewTaskElement(Task.id, Task.title, Task.Assignee, Task.status);
   }
   updateTaskCount();
   updateUI();
   updateButton();
-  
-  
 };
-
 
 // parse the data from local storage
 if (storage !== null) {
   Tasks = JSON.parse(storage);
   refresh();
+  console.log(Tasks);
 }
-
 
 // search bar
 const searchTasks = () => {
@@ -307,15 +232,11 @@ const searchTasks = () => {
   });
   listRoot.innerHTML = "";
   for (const Task of filteredTasks) {
-    renderNewTaskElement(
-      Task.id,
-      Task.title,
-      Task.Assignee,
-      Task.status
-    );
+    renderNewTaskElement(Task.id, Task.title, Task.Assignee, Task.status);
   }
 };
 
 searchInput.addEventListener("input", searchTasks);
-
-console.log(Tasks);
+startAddTaskButton.addEventListener("click", toggleTaskModal);
+cancelAddTaskButton.addEventListener("click", cancelAddTaskHandler);
+confirmAddTaskButton.addEventListener("click", AddTaskHandler);

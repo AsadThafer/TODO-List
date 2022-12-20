@@ -15,6 +15,7 @@ let storage = localStorage.getItem("TasksList");
 
 let Tasks = [];
 
+// visual
 const toggleBackdrop = () => {
   backdrop.classList.toggle("visible");
 };
@@ -27,113 +28,26 @@ const updateUI = () => {
   }
 };
 
-const closeTaskDeletionModal = () => {
+const toggleTaskDeletionModal = () => {
+  deleteTaskModal.classList.toggle("visible");
   toggleBackdrop();
-  deleteTaskModal.classList.remove("visible");
 };
 
-const deleteTaskHandler = (TaskId) => {
-  let IdentifiedIndex = 0;
-  for (const Task of Tasks) {
-    if (Task.id === TaskId) {
-      break;
-    }
-    IdentifiedIndex++;
+const toggleTaskModal = () => {
+  addTaskModal.classList.toggle("visible");
+    toggleBackdrop();
+
+};
+
+const clearTaskInput = () => {
+  for (const userInput of userInputs) {
+    userInput.value = "";
   }
-  Tasks.splice(IdentifiedIndex, 1);
-  listRoot.children[IdentifiedIndex].remove();
-  closeTaskDeletionModal();
-  updateUI();
-  updateTaskCount();
-  saveToLocal();
-};
-
-// const startUpdateTaskHandler = (TaskId) => {
-//   const Task = Tasks.find((t) => t.id === TaskId);
-//   const title = Task.title;
-//   const Assignee = Task.Assignee;
-//   const status = Task.status;
-//   const updateTaskModal = document.getElementById("update-modal");
-//   const updateTaskTitle = updateTaskModal.querySelector("#update-title");
-//   const updateTaskDescription = updateTaskModal.querySelector(
-//     "#update-description"
-//   );
-//   const updateTaskDate = updateTaskModal.querySelector("#update-date");
-//   const updateTaskTime = updateTaskModal.querySelector("#update-time");
-//   const updateTaskStatus = updateTaskModal.querySelector("#update-status");
-//   const updateTaskButton = updateTaskModal.querySelector(".btn--success");
-//   const cancelUpdateTaskButton = updateTaskModal.querySelector(".btn--passive");
-//   const updateTaskModalBackdrop = document.getElementById("backdrop");
-//   const updateTaskModalCloseButton = updateTaskModal.querySelector(
-//     ".btn--passive"
-//   );
-//   updateTaskTitle.value = title;
-//   updateTaskAssignee.value = description;
-//   updateTaskStatus.value = status;
-//   updateTaskButton.addEventListener("click", () => {
-//     const updatedTitle = updateTaskTitle.value;
-//     const updatedAssignee = updateTaskAssignee.value;
-//     const updatedStatus = updateTaskStatus.value;
-//     const updatedTask = {
-//       id: TaskId,
-//       title: updatedTitle,
-//       description: updatedAssignee,
-//       status: updatedStatus,
-//     };
-//     Tasks[index] = updatedTask;
-//     listRoot.children[index].remove();
-//     renderNewTaskElement(updatedTask.id, updatedTask.title, updatedTask.Assignee,updatedTask.status);
-//     updateTaskModal.classList.remove("visible");
-//     updateTaskModalBackdrop.classList.remove("visible");
-//     updateUI();
-//     updateTaskCount();
-//     saveToLocal();
-//   });
-//   cancelUpdateTaskButton.addEventListener("click", () => {
-//     updateTaskModal.classList.remove("visible");
-//     updateTaskModalBackdrop.classList.remove("visible");
-//   });
-//   updateTaskModalCloseButton.addEventListener("click", () => {
-//     updateTaskModal.classList.remove("visible");
-//     updateTaskModalBackdrop.classList.remove("visible");
-//   });
-//   updateTaskModalBackdrop.addEventListener("click", () => {
-//     updateTaskModal.classList.remove("visible");
-//     updateTaskModalBackdrop.classList.remove("visible");
-//   });
-//   updateTaskModal.classList.add("visible");
-//   updateTaskModalBackdrop.classList.add("visible");
-// };
-
-const startdeleteTaskHandler = (TaskId) => {
-  deleteTaskModal.classList.add("visible");
-  toggleBackdrop();
-  const cancelDeletionButton = deleteTaskModal.querySelector(".btn--passive");
-  let confirmDeletionButton = deleteTaskModal.querySelector(".btn--danger");
-  confirmDeletionButton.replaceWith(confirmDeletionButton.cloneNode(true));
-  confirmDeletionButton = deleteTaskModal.querySelector(".btn--danger");
-  cancelDeletionButton.removeEventListener("click", closeTaskDeletionModal);
-  cancelDeletionButton.addEventListener("click", closeTaskDeletionModal);
-  confirmDeletionButton.addEventListener(
-    "click",
-    deleteTaskHandler.bind(null, TaskId)
-  );
-};
-
-// save to local storage
-const saveToLocal = () => {
-  localStorage.setItem("TasksList", JSON.stringify(Tasks));
 };
 
 const updateStatus = (TaskId) => {
-  let IdentifiedIndex = 0;
   console.log(Tasks);
-  for (const Task of Tasks) {
-    if (Task.id === TaskId) {
-      break;
-    }
-    IdentifiedIndex++;
-  }
+  const IdentifiedIndex = Tasks.findIndex((task) => task.id ===TaskId);
   if (Tasks[IdentifiedIndex].status == "TO-DO") {
     Tasks[IdentifiedIndex].status = "DONE";
     listRoot.children[IdentifiedIndex].className = "Task-element DONE";
@@ -201,21 +115,37 @@ const updateTaskCount = () => {
   doneCountSpan.textContent = doneCount;
 };
 
-const closeTaskModal = () => {
-  addTaskModal.classList.remove("visible");
+//delete task
+const deleteTaskHandler = (TaskId) => {
+  const IdentifiedIndex = Tasks.findIndex((task) => task.id ===TaskId);
+  Tasks.splice(IdentifiedIndex, 1);
+  listRoot.children[IdentifiedIndex].remove();
+  toggleTaskDeletionModal();
+  updateUI();
+  updateTaskCount();
+  saveToLocal();
 };
 
-const showTaskModal = () => {
-  addTaskModal.classList.add("visible");
-  toggleBackdrop();
+const startdeleteTaskHandler = (TaskId) => {
+  toggleTaskDeletionModal();
+  const cancelDeletionButton = deleteTaskModal.querySelector(".btn--passive");
+  let confirmDeletionButton = deleteTaskModal.querySelector(".btn--danger");
+  confirmDeletionButton.replaceWith(confirmDeletionButton.cloneNode(true));
+  confirmDeletionButton = deleteTaskModal.querySelector(".btn--danger");
+  cancelDeletionButton.removeEventListener("click", toggleTaskDeletionModal);
+  cancelDeletionButton.addEventListener("click", toggleTaskDeletionModal);
+  confirmDeletionButton.addEventListener(
+    "click",
+    deleteTaskHandler.bind(null, TaskId)
+  );
 };
 
-const clearTaskInput = () => {
-  for (const userInput of userInputs) {
-    userInput.value = "";
-  }
+// save to local storage
+const saveToLocal = () => {
+  localStorage.setItem("TasksList", JSON.stringify(Tasks));
 };
 
+//add task
 const AddTaskHandler = () => {
   const titleValue = userInputs[0].value;
   const AssigneeValue = userInputs[1].value;
@@ -231,8 +161,7 @@ const AddTaskHandler = () => {
   };
   Tasks.push(newTask);
   console.log(Tasks);
-  closeTaskModal();
-  toggleBackdrop();
+  toggleTaskModal();
   clearTaskInput();
   updateUI();
   renderNewTaskElement(
@@ -246,27 +175,25 @@ const AddTaskHandler = () => {
 };
 
 const cancelAddTaskHandler = () => {
-  closeTaskModal();
-  toggleBackdrop();
+  toggleTaskModal();
   clearTaskInput();
 };
 
+// backdrop click handler
 const backdropClickHandler = () => {
-  closeTaskModal();
-  closeTaskDeletionModal();
+  if (addTaskModal.classList.contains("visible")) {
+    toggleTaskModal();
+  }
+  if (deleteTaskModal.classList.contains("visible")) {
+    toggleTaskDeletionModal();
+  }
   clearTaskInput();
 };
 
-startAddTaskButton.addEventListener("click", showTaskModal);
-backdrop.addEventListener("click", backdropClickHandler);
-cancelAddTaskButton.addEventListener("click", cancelAddTaskHandler);
-confirmAddTaskButton.addEventListener("click", AddTaskHandler);
-
+// update Page content and UI elements after Refresh
 const refresh = () => {
   for (const Task of Tasks) {
     renderNewTaskElement(Task.id, Task.title, Task.Assignee, Task.status);
-    // updateStatus(Task.id);
-    // updateStatus(Task.id);
   }
   updateTaskCount();
   updateUI();
@@ -277,6 +204,7 @@ const refresh = () => {
 if (storage !== null) {
   Tasks = JSON.parse(storage);
   refresh();
+  console.log(Tasks);
 }
 
 // search bar
@@ -293,5 +221,8 @@ const searchTasks = () => {
 };
 
 searchInput.addEventListener("input", searchTasks);
+startAddTaskButton.addEventListener("click", toggleTaskModal);
+backdrop.addEventListener("click", backdropClickHandler);
+cancelAddTaskButton.addEventListener("click", cancelAddTaskHandler);
+confirmAddTaskButton.addEventListener("click", AddTaskHandler);
 
-console.log(Tasks);

@@ -1,11 +1,9 @@
 const addTaskModal = document.getElementById("add-modal");
 const startAddTaskButton = document.querySelector("#startAddTask");
-const backdrop = document.getElementById("backdrop");
 const cancelAddTaskButton = addTaskModal.querySelector(".btn--passive");
 const confirmAddTaskButton = addTaskModal.querySelector(".btn--success");
 const userInputs = addTaskModal.querySelectorAll("input"); //array like
 const entryTextSection = document.getElementById("entry-text");
-const deleteTaskModal = document.getElementById("delete-modal");
 const updateTaskModal = document.getElementById("update-modal");
 const todoCountSpan = document.getElementById("TO-DO");
 const doneCountSpan = document.getElementById("DONE");
@@ -16,9 +14,7 @@ let storage = localStorage.getItem("TasksList");
 let Tasks = [];
 
 // visual
-const toggleBackdrop = () => {
-  backdrop.classList.toggle("visible");
-};
+
 
 const updateUI = () => {
   if (Tasks.length === 0) {
@@ -28,14 +24,10 @@ const updateUI = () => {
   }
 };
 
-const toggleTaskDeletionModal = () => {
-  deleteTaskModal.classList.toggle("visible");
-  toggleBackdrop();
-};
 
 const toggleTaskModal = () => {
   addTaskModal.classList.toggle("visible");
-    toggleBackdrop();
+  createBackDrop();
 
 };
 
@@ -95,7 +87,7 @@ const renderNewTaskElement = (id, title, Assignee, status) => {
     updateStatus(id);
   });
   newTaskElement.querySelector(".btn--delete").addEventListener("click", () => {
-    startdeleteTaskHandler(id);
+    createDeleteModal(id);
   });
   const listRoot = document.getElementById("Task-list");
   listRoot.append(newTaskElement);
@@ -115,30 +107,74 @@ const updateTaskCount = () => {
   doneCountSpan.textContent = doneCount;
 };
 
-//delete task
-const deleteTaskHandler = (TaskId) => {
-  const IdentifiedIndex = Tasks.findIndex((task) => task.id ===TaskId);
-  Tasks.splice(IdentifiedIndex, 1);
-  listRoot.children[IdentifiedIndex].remove();
-  toggleTaskDeletionModal();
-  updateUI();
-  updateTaskCount();
-  saveToLocal();
+const createBackDrop = () => {
+  if (document.getElementById("backdrop")) {
+    backdrop.remove();
+  }else{
+    const backdrop = document.createElement("div");
+    backdrop.classList.add("backdrop");
+    backdrop.classList.add("visible");
+    backdrop.id = "backdrop";
+    backdrop.addEventListener("click", () => {
+      backdrop.remove();
+      addTaskModal.classList.remove("visible");
+      if(document.getElementById("delete-modal")){
+        document.getElementById("delete-modal").remove();
+      }
+    });
+    document.body.append(backdrop);
+  };
+  }
+
+const createDeleteModal = (id) => {
+  const deleteTaskElement = document.createElement("div");
+  deleteTaskElement.classList.add("modal");
+  deleteTaskElement.classList.add("visible");
+  deleteTaskElement.id = "delete-modal";
+  const myh2 = document.createElement("h2");
+  myh2.classList.add("modal__title");
+  myh2.textContent = "Are you sure?";
+  const myp = document.createElement("p");
+  myp.classList.add("modal__content");
+  myp.textContent = "Are you sure you want to delete this Task?";
+  const mydiv = document.createElement("div");
+  mydiv.classList.add("modal__actions");
+  const mybutton1 = document.createElement("button");
+  mybutton1.classList.add("btn");
+  mybutton1.classList.add("btn--passive");
+  mybutton1.textContent = "Cancel";
+  mybutton1.addEventListener("click", ()=>{
+    deleteTaskElement.remove();
+    createBackDrop();
+  });
+  const mybutton2 = document.createElement("button");
+  mybutton2.classList.add("btn");
+  mybutton2.classList.add("btn--danger");
+  mybutton2.textContent = "Delete";
+  mybutton2.addEventListener("click", (i)=>{
+    IdentifiedIndex = Tasks.findIndex((task) => task.id ===id);
+    Tasks.splice(IdentifiedIndex,1);
+    listRoot.children[IdentifiedIndex].remove();
+    i.target.parentElement.parentElement.remove();
+    updateUI();
+    updateTaskCount();
+    saveToLocal();
+    createBackDrop();
+  });
+  mydiv.append(mybutton1);
+  mydiv.append(mybutton2);
+
+  deleteTaskElement.append(myh2);
+  deleteTaskElement.append(myp);
+  deleteTaskElement.append(mydiv);
+  createBackDrop();
+  document.body.append(deleteTaskElement);
+  
+
+
 };
 
-const startdeleteTaskHandler = (TaskId) => {
-  toggleTaskDeletionModal();
-  const cancelDeletionButton = deleteTaskModal.querySelector(".btn--passive");
-  let confirmDeletionButton = deleteTaskModal.querySelector(".btn--danger");
-  confirmDeletionButton.replaceWith(confirmDeletionButton.cloneNode(true));
-  confirmDeletionButton = deleteTaskModal.querySelector(".btn--danger");
-  cancelDeletionButton.removeEventListener("click", toggleTaskDeletionModal);
-  cancelDeletionButton.addEventListener("click", toggleTaskDeletionModal);
-  confirmDeletionButton.addEventListener(
-    "click",
-    deleteTaskHandler.bind(null, TaskId)
-  );
-};
+
 
 // save to local storage
 const saveToLocal = () => {
@@ -179,16 +215,6 @@ const cancelAddTaskHandler = () => {
   clearTaskInput();
 };
 
-// backdrop click handler
-const backdropClickHandler = () => {
-  if (addTaskModal.classList.contains("visible")) {
-    toggleTaskModal();
-  }
-  if (deleteTaskModal.classList.contains("visible")) {
-    toggleTaskDeletionModal();
-  }
-  clearTaskInput();
-};
 
 // update Page content and UI elements after Refresh
 const refresh = () => {
@@ -222,7 +248,6 @@ const searchTasks = () => {
 
 searchInput.addEventListener("input", searchTasks);
 startAddTaskButton.addEventListener("click", toggleTaskModal);
-backdrop.addEventListener("click", backdropClickHandler);
 cancelAddTaskButton.addEventListener("click", cancelAddTaskHandler);
 confirmAddTaskButton.addEventListener("click", AddTaskHandler);
 

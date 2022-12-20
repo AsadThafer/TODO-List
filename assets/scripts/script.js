@@ -15,7 +15,6 @@ let Tasks = [];
 
 // visual
 
-
 const updateUI = () => {
   if (Tasks.length === 0) {
     entryTextSection.style.display = "block";
@@ -24,11 +23,9 @@ const updateUI = () => {
   }
 };
 
-
 const toggleTaskModal = () => {
   addTaskModal.classList.toggle("visible");
   createBackDrop();
-
 };
 
 const clearTaskInput = () => {
@@ -39,7 +36,7 @@ const clearTaskInput = () => {
 
 const updateStatus = (TaskId) => {
   console.log(Tasks);
-  const IdentifiedIndex = Tasks.findIndex((task) => task.id ===TaskId);
+  const IdentifiedIndex = Tasks.findIndex((task) => task.id === TaskId);
   if (Tasks[IdentifiedIndex].status == "TO-DO") {
     Tasks[IdentifiedIndex].status = "DONE";
     listRoot.children[IdentifiedIndex].className = "Task-element DONE";
@@ -110,7 +107,7 @@ const updateTaskCount = () => {
 const createBackDrop = () => {
   if (document.getElementById("backdrop")) {
     backdrop.remove();
-  }else{
+  } else {
     const backdrop = document.createElement("div");
     backdrop.classList.add("backdrop");
     backdrop.classList.add("visible");
@@ -118,13 +115,13 @@ const createBackDrop = () => {
     backdrop.addEventListener("click", () => {
       backdrop.remove();
       addTaskModal.classList.remove("visible");
-      if(document.getElementById("delete-modal")){
+      if (document.getElementById("delete-modal")) {
         document.getElementById("delete-modal").remove();
       }
     });
     document.body.append(backdrop);
-  };
   }
+};
 
 const createDeleteModal = (id) => {
   const deleteTaskElement = document.createElement("div");
@@ -143,7 +140,7 @@ const createDeleteModal = (id) => {
   mybutton1.classList.add("btn");
   mybutton1.classList.add("btn--passive");
   mybutton1.textContent = "Cancel";
-  mybutton1.addEventListener("click", ()=>{
+  mybutton1.addEventListener("click", () => {
     deleteTaskElement.remove();
     createBackDrop();
   });
@@ -151,9 +148,9 @@ const createDeleteModal = (id) => {
   mybutton2.classList.add("btn");
   mybutton2.classList.add("btn--danger");
   mybutton2.textContent = "Delete";
-  mybutton2.addEventListener("click", (i)=>{
-    IdentifiedIndex = Tasks.findIndex((task) => task.id ===id);
-    Tasks.splice(IdentifiedIndex,1);
+  mybutton2.addEventListener("click", (i) => {
+    IdentifiedIndex = Tasks.findIndex((task) => task.id === id);
+    Tasks.splice(IdentifiedIndex, 1);
     listRoot.children[IdentifiedIndex].remove();
     i.target.parentElement.parentElement.remove();
     updateUI();
@@ -163,18 +160,12 @@ const createDeleteModal = (id) => {
   });
   mydiv.append(mybutton1);
   mydiv.append(mybutton2);
-
   deleteTaskElement.append(myh2);
   deleteTaskElement.append(myp);
   deleteTaskElement.append(mydiv);
   createBackDrop();
   document.body.append(deleteTaskElement);
-  
-
-
 };
-
-
 
 // save to local storage
 const saveToLocal = () => {
@@ -215,7 +206,6 @@ const cancelAddTaskHandler = () => {
   clearTaskInput();
 };
 
-
 // update Page content and UI elements after Refresh
 const refresh = () => {
   for (const Task of Tasks) {
@@ -250,4 +240,3 @@ searchInput.addEventListener("input", searchTasks);
 startAddTaskButton.addEventListener("click", toggleTaskModal);
 cancelAddTaskButton.addEventListener("click", cancelAddTaskHandler);
 confirmAddTaskButton.addEventListener("click", AddTaskHandler);
-
